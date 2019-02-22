@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
@@ -13,6 +15,9 @@ class _GetLocationPageState extends State<GetLocationPage> {
 
   var location = new Location();
   final List<Map<String, double>> _allLocations = <Map<String, double>>[];
+  var trace1 = <Map<String, double>>[];
+  Timer timer;
+  final freq = const Duration(seconds:5);
 
   Map<String, double> userLocation;
 
@@ -46,15 +51,22 @@ class _GetLocationPageState extends State<GetLocationPage> {
         appBar: new AppBar(
         title: const Text('Location Info'),
           actions: <Widget>[
-            new IconButton(icon: const Icon(Icons.location_on), onPressed: () {
+            new IconButton(icon: const Icon(Icons.play_arrow), onPressed: () {
+              timer =  Timer.periodic(freq, (timer)  {
               _getLocation().then((value) {
                 setState(() {
-                  userLocation = value;
-                  _allLocations.add(userLocation);
+                    userLocation = value;
+                    _allLocations.add(userLocation);
+                  });
                 });
               });
             }),
-          ],
+            new IconButton(icon: const Icon(Icons.stop), onPressed: () {
+                  timer.cancel();
+                  trace1 = _allLocations;
+                  _allLocations.removeRange(0, _allLocations.length-1);
+
+            })],
         ),
         body: new ListView(children: divided),
       )
