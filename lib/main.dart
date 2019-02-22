@@ -63,6 +63,7 @@ class _GetLocationPageState extends State<GetLocationPage> {
             }),
             new IconButton(icon: const Icon(Icons.stop), onPressed: () {
                   timer.cancel();
+                  // Currently trace1 not used
                   trace1 = _allLocations;
                   _allLocations.removeRange(0, _allLocations.length-1);
 
