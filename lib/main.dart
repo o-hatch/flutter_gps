@@ -18,8 +18,6 @@ class _GetLocationPageState extends State<GetLocationPage> {
 
   var location = new Location();
   //final List<Map<String, double>> _allLocations = <Map<String, double>>[];
-  //var trace1 = <Map<String, double>>[];
-  //var traceCounter = 1; // Initialize to one
   Timer timer;
   final freq = const Duration(seconds:5);
 
