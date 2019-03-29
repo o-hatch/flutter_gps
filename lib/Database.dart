@@ -66,48 +66,31 @@ class DBProvider {
     return res.isNotEmpty ? LocationData.fromMap(res.first) : null;
   }
 
-  /*Future<List<LocationData>> getBlockedClients() async {
-    final db = await database;
-
-    print("works");
-    // var res = await db.rawQuery("SELECT * FROM Client WHERE blocked=1");
-    var res = await db.query("Client", where: "blocked = ? ", whereArgs: [1]);
-
-    List<Client> list =
-    res.isNotEmpty ? res.map((c) => Client.fromMap(c)).toList() : [];
-    return list;
-  }*/
-
-  // Method do increment trace number
-  changeTraceNum(LocationData changeTraceNum) async {
+  newLocationData_SameTrace(LocationData newLocationData) async {
     final db = await database;
     //get the biggest id in the table
-    var table = await db.rawQuery("SELECT MAX(traceNum)+1 as traceNum FROM LocationData");
-    int traceNum = table.first["traceNum"];
-    //insert to the table using the new id
+    var table = await db.rawQuery("SELECT MAX(recordNum)+1 as recordNum FROM LocationData");
+    int recordNum = table.first["recordNum"];
+    int lastRecordNum = recordNum - 1;
+    var res = await db.query("LocationData", where: "recordNum = ?", whereArgs: [lastRecordNum]);
+    //var lastLocation = getLocationData(lastRecordNum);
+    int traceNum = res.first["traceNum"];
     var raw = await db.rawInsert(
         "INSERT Into LocationData (recordNum, traceNum, id,latitude,longitude,altitude, accuracy)"
             " VALUES (?,?,?,?,?,?,?)",
-        [changeTraceNum.recordNum, traceNum, changeTraceNum.id, changeTraceNum.latitude, changeTraceNum.longitude, changeTraceNum.altitude, changeTraceNum.accuracy]);
+        [recordNum, traceNum, newLocationData.id, newLocationData.latitude, newLocationData.longitude, newLocationData.altitude, newLocationData.accuracy]);
     return raw;
+
   }
 
-  // Alternative method to increment trace number
-  incrementTraceNum(LocationData location) async {
-      final db = await database;
-      LocationData newtrace = LocationData(
-          recordNum: location.recordNum,
-          traceNum: location.traceNum + 1,
-          id: location.id,
-          latitude: location.latitude,
-          longitude: location.longitude,
-          altitude: location.altitude,
-          accuracy: location.accuracy);
-      var res = await db.update("LocationData", newtrace.toMap(),
-          where: "recordNum = ?", whereArgs: [location.recordNum]);
-      return res;
-  }
 
+  Future<List<LocationData>> getTraceData(int traceNum) async {
+    final db = await database;
+    var res = await db.query("LocationData", where: "traceNum = ?", whereArgs: [traceNum]);
+    List<LocationData> list =
+    res.isNotEmpty ? res.map((c) => LocationData.fromMap(c)).toList() : [];
+    return list;
+  }
 
 
   Future<List<LocationData>> getAllLocationData() async {

@@ -51,7 +51,4 @@ class LocationData {
     "accuracy": accuracy,
   };
 
-  int getTraceNum() {
-    return traceNum;
-  }
 }
