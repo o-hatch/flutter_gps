@@ -66,7 +66,7 @@ class DBProvider {
     return res.isNotEmpty ? LocationData.fromMap(res.first) : null;
   }
 
-  newLocationData_SameTrace(LocationData newLocationData) async {
+  newLocationDataSameTrace(LocationData newLocationData) async {
     final db = await database;
     //get the biggest id in the table
     var table = await db.rawQuery("SELECT MAX(recordNum)+1 as recordNum FROM LocationData");
@@ -83,6 +83,16 @@ class DBProvider {
 
   }
 
+  Future<List<LocationData>> getTraceNums() async {
+    final db = await database;
+    var res = await db.rawQuery("SELECT DISTINCT tracenum FROM LocationData");
+    List<LocationData> list =
+    res.isNotEmpty ? res.map((c) => LocationData.fromMap(c)).toList() : [];
+    return list;
+
+
+  }
+
 
   Future<List<LocationData>> getTraceData(int traceNum) async {
     final db = await database;
@@ -90,6 +100,7 @@ class DBProvider {
     List<LocationData> list =
     res.isNotEmpty ? res.map((c) => LocationData.fromMap(c)).toList() : [];
     return list;
+
   }
 
 
@@ -104,6 +115,12 @@ class DBProvider {
   deleteLocationData(int recordNum) async {
     final db = await database;
     return db.delete("LocationData", where: "recordNum = ?", whereArgs: [recordNum]);
+  }
+
+  deleteTraceData(int traceNum) async {
+    final db = await database;
+    return db.delete(
+        "LocationData", where: "traceNum = ?", whereArgs: [traceNum]);
   }
 
   deleteAll() async {
