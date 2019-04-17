@@ -1,12 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
-import 'package:flutter_gps4/LocationDataModel.dart';
-import 'package:flutter_gps4/Database.dart';
 import 'package:flutter_gps4/NewTrace.dart';
 import 'package:flutter_gps4/SavedTraces.dart';
-//import 'dart:math' as math;
+
 
 
 //void main() => runApp(GetLocationPage());

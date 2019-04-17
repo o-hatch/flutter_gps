@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_gps4/LocationDataModel.dart';
 import 'package:sqflite/sqflite.dart';
 
+
 class DBProvider {
   DBProvider._();
 
@@ -35,7 +36,16 @@ class DBProvider {
               "latitude FLOAT,"
               "longitude FLOAT,"
               "altitude FLOAT,"
-              "accuracy FLOAT"
+              "accuracy FLOAT,"
+              "accelerometerX FLOAT,"
+              "accelerometerY FLOAT,"
+              "accelerometerZ FLOAT,"
+              "gyroscopeX FLOAT,"
+              "gyroscopeY FLOAT,"
+              "gyroscopeZ FLOAT,"
+              "userAccelerometerX FLOAT,"
+              "userAccelerometerY FLOAT,"
+              "userAccelerometerZ FLOAT"
               ")");
         });
   }
@@ -47,9 +57,13 @@ class DBProvider {
     int recordNum = table.first["recordNum"];
     //insert to the table using the new id
     var raw = await db.rawInsert(
-        "INSERT Into LocationData (recordNum, traceNum, id,latitude,longitude,altitude, accuracy)"
-            " VALUES (?,?,?,?,?,?,?)",
-        [recordNum, newLocationData.traceNum, newLocationData.id, newLocationData.latitude, newLocationData.longitude, newLocationData.altitude, newLocationData.accuracy]);
+        "INSERT Into LocationData (recordNum, traceNum, id, latitude, longitude, altitude, accuracy, accelerometerX, accelerometerY, accelerometerZ,"
+            " gyroscopeX, gyroscopeY, gyroscopeZ, userAccelerometerX, userAccelerometerY, userAccelerometerZ)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [recordNum, newLocationData.traceNum, newLocationData.id, newLocationData.latitude, newLocationData.longitude,
+          newLocationData.altitude, newLocationData.accuracy, newLocationData.accelerometerX, newLocationData.accelerometerY, newLocationData.accelerometerZ,
+          newLocationData.gyroscopeX, newLocationData.gyroscopeY, newLocationData.gyroscopeZ, newLocationData.userAccelerometerX,
+          newLocationData.userAccelerometerY, newLocationData.userAccelerometerZ]);
     return raw;
   }
 
@@ -76,9 +90,13 @@ class DBProvider {
     //var lastLocation = getLocationData(lastRecordNum);
     int traceNum = res.first["traceNum"];
     var raw = await db.rawInsert(
-        "INSERT Into LocationData (recordNum, traceNum, id,latitude,longitude,altitude, accuracy)"
-            " VALUES (?,?,?,?,?,?,?)",
-        [recordNum, traceNum, newLocationData.id, newLocationData.latitude, newLocationData.longitude, newLocationData.altitude, newLocationData.accuracy]);
+        "INSERT Into LocationData (recordNum, traceNum, id, latitude, longitude, altitude, accuracy, accelerometerX, accelerometerY, accelerometerZ,"
+            " gyroscopeX, gyroscopeY, gyroscopeZ, userAccelerometerX, userAccelerometerY, userAccelerometerZ)"
+            " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [recordNum, traceNum, newLocationData.id, newLocationData.latitude, newLocationData.longitude,
+          newLocationData.altitude, newLocationData.accuracy, newLocationData.accelerometerX, newLocationData.accelerometerY, newLocationData.accelerometerZ,
+        newLocationData.gyroscopeX, newLocationData.gyroscopeY, newLocationData.gyroscopeZ, newLocationData.userAccelerometerX,
+        newLocationData.userAccelerometerY, newLocationData.userAccelerometerZ]);
     return raw;
 
   }

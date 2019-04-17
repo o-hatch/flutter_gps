@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:location/location.dart';
 import 'package:flutter_gps4/LocationDataModel.dart';
 import 'package:flutter_gps4/Database.dart';
 
@@ -19,33 +16,6 @@ class _SavedTracesState extends State<SavedTraces> {
       appBar: new AppBar(
         title: const Text('Saved Traces'),
       ),
-
-/*      body: ListView(
-        children: <Widget>[
-          ListTile(
-            leading: Icon(Icons.wb_sunny),
-            title: Text('Sun'),
-            trailing: Icon(Icons.keyboard_arrow_right),
-            onTap: () {
-              print('Sun');
-            },
-          ),
-          ListTile(
-              leading: Icon(Icons.brightness_3),
-              title: Text('Moon'),
-              trailing: Icon(Icons.keyboard_arrow_right),
-              onTap: () {
-                _navigateToSecondScreen(context);
-              }
-          ),
-          ListTile(
-            leading: Icon(Icons.star),
-            title: Text('Star'),
-            trailing: Icon(Icons.keyboard_arrow_right),
-          ),
-        ],
-      ),
-*/
       body: FutureBuilder<List<LocationData>>(
         future: DBProvider.db.getTraceNums(),
         builder: (BuildContext context, AsyncSnapshot<List<LocationData>> snapshot) {
@@ -78,10 +48,6 @@ class _SavedTracesState extends State<SavedTraces> {
 
     );
   }
-
-
-
-
 
 
   void _navigateToSecondScreen(BuildContext context, int traceNum) {
@@ -123,11 +89,32 @@ class SecondScreen extends StatelessWidget {
                     DBProvider.db.deleteLocationData(item.recordNum);
                   },
                   child: ListTile(
-                      title: Text(
-                          "Latitude: " + item.latitude.toString() + "\n" +
-                              "Longitude: " + item.longitude.toString() + "\n" +
-                              "Alitutude: " + item.altitude.toString() + "\n" +
-                              "Accuracy: " + item.accuracy.toString()
+                      title: RichText (
+                        text: new TextSpan(
+                          style: new TextStyle(
+                            fontSize: 14.0,
+                            color: Colors.black,
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(text: 'Latitude: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: item.latitude.toString() + "\n"),
+                            TextSpan(text: 'Longitude: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: item.longitude.toString() + "\n"),
+                            TextSpan(text: 'Altitude: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: item.altitude.toString() + "\n"),
+                            TextSpan(text: 'Accuracy: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: item.accuracy.toString() + "\n"),
+                            TextSpan(text: 'Accelerometer: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: "[" + item.accelerometerX.toStringAsFixed(2) + ", "
+                                + item.accelerometerY.toStringAsFixed(2) + ", " + item.accelerometerZ.toStringAsFixed(2) + "]\n"),
+                            TextSpan(text: 'Gyroscope: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: "[" + item.gyroscopeX.toStringAsFixed(2) + ", "
+                                + item.gyroscopeY.toStringAsFixed(2) + ", " + item.gyroscopeZ.toStringAsFixed(2) + "]\n"),
+                            TextSpan(text: 'UserAccelerometer: ', style: new TextStyle(fontWeight: FontWeight.bold)),
+                            TextSpan(text: "[" + item.userAccelerometerX.toStringAsFixed(2) + ", "
+                                + item.userAccelerometerY.toStringAsFixed(2) + ", " + item.userAccelerometerZ.toStringAsFixed(2) + "]"),
+                          ],
+                        ),
                       ),
                       leading: Text(counter.toString()),
                   ),
