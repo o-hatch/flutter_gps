@@ -28,119 +28,20 @@ class _NewTraceState extends State<NewTrace> {
   List<double> _gyroscopeValues;
   List<StreamSubscription<dynamic>> _streamSubscriptions = <StreamSubscription<dynamic>>[];
 
+  var _isStartDisabled = false;
+  var _isStopDisabled = true;
+
 
   @override
   Widget build(BuildContext context) {
-
-    //final List<String> accelerometer = _accelerometerValues?.map((double v) => v.toStringAsFixed(1))?.toList();
-    //final List<String> gyroscope = _gyroscopeValues?.map((double v) => v.toStringAsFixed(1))?.toList();
-    //final List<String> userAccelerometer = _userAccelerometerValues ?.map((double v) => v.toStringAsFixed(1)) ?.toList();
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: new AppBar(
         title: const Text('Start New Trace'),
         actions: <Widget>[
-          new IconButton(icon: const Icon(Icons.play_arrow), onPressed: () {
-            // Update all data
-            _getLocation().then((value) {
-              setState(() {
-                userLocation = value;
-                int traceHashCode = userLocation.hashCode;
-                allTraces.add(traceHashCode);
-                LocationData userLocationData = LocationData(
-                    traceNum: traceHashCode,
-                    latitude: userLocation["latitude"],
-                    longitude: userLocation["longitude"],
-                    altitude: userLocation["altitude"],
-                    accuracy: userLocation["accuracy"],
-                    accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
-                    accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
-                    accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
-                    gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
-                    gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
-                    gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
-                    userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
-                    userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
-                    userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
-                DBProvider.db.newLocationData(userLocationData);
-
-                setState(() {});
-              });
-            });
-
-            // Update only accelerometer, gyroscope, and user accelerometer data
-            accelTimer = Timer.periodic(accelFreq, (accelTimer) {
-              LocationData userLocationData = LocationData(
-                  latitude: userLocation["latitude"],
-                  longitude: userLocation["longitude"],
-                  altitude: userLocation["altitude"],
-                  accuracy: userLocation["accuracy"],
-                  accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
-                  accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
-                  accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
-                  gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
-                  gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
-                  gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
-                  userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
-                  userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
-                  userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
-              DBProvider.db.newLocationDataSameTrace(userLocationData);
-            });
-
-            timer = Timer.periodic(locationFreq, (timer) {
-
-              accelTimer.cancel();
-
-
-              // Update all data
-              _getLocation().then((value) {
-                setState(() {
-                  userLocation = value;
-                  LocationData userLocationData = LocationData(
-                      latitude: userLocation["latitude"],
-                      longitude: userLocation["longitude"],
-                      altitude: userLocation["altitude"],
-                      accuracy: userLocation["accuracy"],
-                      accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
-                      accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
-                      accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
-                      gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
-                      gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
-                      gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
-                      userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
-                      userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
-                      userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
-                  DBProvider.db.newLocationDataSameTrace(userLocationData);
-                  setState(() {});
-                });
-              });
-
-              // Update only accelerometer, gyroscope, and user accelerometer data
-              accelTimer = Timer.periodic(accelFreq, (accelTimer) {
-                LocationData userLocationData = LocationData(
-                    latitude: userLocation["latitude"],
-                    longitude: userLocation["longitude"],
-                    altitude: userLocation["altitude"],
-                    accuracy: userLocation["accuracy"],
-                    accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
-                    accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
-                    accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
-                    gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
-                    gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
-                    gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
-                    userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
-                    userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
-                    userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
-                DBProvider.db.newLocationDataSameTrace(userLocationData);
-              });
-
-            });
-          }),
-          new IconButton(icon: const Icon(Icons.stop), onPressed: () {
-            accelTimer.cancel();
-            timer.cancel();
-          }),
+          _buildStartIcon(),
+          _buildStopIcon(),
           new IconButton(icon: const Icon(Icons.delete), onPressed: () {
             DBProvider.db.deleteAll();
             setState(() {});
@@ -243,6 +144,167 @@ class _NewTraceState extends State<NewTrace> {
         _userAccelerometerValues = <double>[event.x, event.y, event.z];
       });
     }));
+  }
+
+  void _switchButtons() {
+    setState(() {
+      _isStartDisabled = !_isStartDisabled;
+      _isStopDisabled = !_isStopDisabled;
+    });
+  }
+
+  void _updateData() {
+    setState(() {
+      // Update all data
+      _getLocation().then((value) {
+        setState(() {
+          userLocation = value;
+          int traceHashCode = userLocation.hashCode;
+          allTraces.add(traceHashCode);
+          LocationData userLocationData = LocationData(
+              traceNum: traceHashCode,
+              latitude: userLocation["latitude"],
+              longitude: userLocation["longitude"],
+              altitude: userLocation["altitude"],
+              accuracy: userLocation["accuracy"],
+              accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
+              accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
+              accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
+              gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
+              gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
+              gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
+              userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
+              userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
+              userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
+          DBProvider.db.newLocationData(userLocationData);
+
+          setState(() {});
+        });
+      });
+
+      // Update only accelerometer, gyroscope, and user accelerometer data
+      accelTimer = Timer.periodic(accelFreq, (accelTimer) {
+        LocationData userLocationData = LocationData(
+            latitude: userLocation["latitude"],
+            longitude: userLocation["longitude"],
+            altitude: userLocation["altitude"],
+            accuracy: userLocation["accuracy"],
+            accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
+            accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
+            accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
+            gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
+            gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
+            gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
+            userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
+            userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
+            userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
+        DBProvider.db.newLocationDataSameTrace(userLocationData);
+      });
+
+      timer = Timer.periodic(locationFreq, (timer) {
+
+        accelTimer.cancel();
+
+
+        // Update all data
+        _getLocation().then((value) {
+          setState(() {
+            userLocation = value;
+            LocationData userLocationData = LocationData(
+                latitude: userLocation["latitude"],
+                longitude: userLocation["longitude"],
+                altitude: userLocation["altitude"],
+                accuracy: userLocation["accuracy"],
+                accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
+                accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
+                accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
+                gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
+                gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
+                gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
+                userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
+                userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
+                userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
+            DBProvider.db.newLocationDataSameTrace(userLocationData);
+            setState(() {});
+          });
+        });
+
+        // Update only accelerometer, gyroscope, and user accelerometer data
+        accelTimer = Timer.periodic(accelFreq, (accelTimer) {
+          LocationData userLocationData = LocationData(
+              latitude: userLocation["latitude"],
+              longitude: userLocation["longitude"],
+              altitude: userLocation["altitude"],
+              accuracy: userLocation["accuracy"],
+              accelerometerX: _accelerometerValues != null ? _accelerometerValues[0]:null,
+              accelerometerY: _accelerometerValues != null ? _accelerometerValues[1]:null,
+              accelerometerZ: _accelerometerValues != null ? _accelerometerValues[2]:null,
+              gyroscopeX: _gyroscopeValues != null ? _gyroscopeValues[0]:null,
+              gyroscopeY: _gyroscopeValues != null ? _gyroscopeValues[1]:null,
+              gyroscopeZ: _gyroscopeValues != null ? _gyroscopeValues[2]:null,
+              userAccelerometerX: _userAccelerometerValues != null ? _userAccelerometerValues[0]:null,
+              userAccelerometerY: _userAccelerometerValues != null ? _userAccelerometerValues[1]:null,
+              userAccelerometerZ: _userAccelerometerValues != null ? _userAccelerometerValues[2]:null);
+          DBProvider.db.newLocationDataSameTrace(userLocationData);
+        });
+
+      });
+    });
+  }
+
+  // Play button
+  Widget _buildStartIcon() {
+    return new ButtonTheme(
+      minWidth: 50.0,
+      height: 50.0,
+      child: RaisedButton.icon(
+        icon: Icon(Icons.play_arrow, size: 30 ),
+        textColor: Colors.white,
+        color: Colors.green[300],
+        elevation: 4.0,
+        onPressed: _startPress(),
+        label: Text(""),
+      ),
+    );
+  }
+
+  // Stop button
+  Widget _buildStopIcon() {
+    return new ButtonTheme(
+      minWidth: 50.0,
+      height: 50.0,
+      child: RaisedButton.icon(
+        icon: Icon(Icons.stop, size: 30),
+        textColor: Colors.white,
+        color: Colors.red,
+        elevation: 4.0,
+        onPressed: _stopPress(),
+        label: Text(""),
+      ),
+    );
+  }
+
+  Function _startPress() {
+    if (_isStartDisabled) {
+      return null;
+    } else {
+      return () {
+        _switchButtons();
+        _updateData();
+      };
+    }
+  }
+
+  Function _stopPress() {
+    if (_isStopDisabled) {
+      return null;
+    } else {
+      return () {
+        _switchButtons();
+        accelTimer.cancel();
+        timer.cancel();
+      };
+    }
   }
 
 }

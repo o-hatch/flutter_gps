@@ -60,6 +60,7 @@ class _SavedTracesState extends State<SavedTraces> {
 
 }
 
+// ignore: must_be_immutable
 class SecondScreen extends StatelessWidget {
   final int traceNum;
   SecondScreen(this.traceNum);
